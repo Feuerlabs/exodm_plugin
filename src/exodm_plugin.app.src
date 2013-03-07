@@ -1,0 +1,15 @@
+%% -*- erlang -*-
+%%
+%% Copyright (c) 2013 Feuerlabs, Inc. All Rights Reserved
+%%
+%% API support functions for Exosense server plugin developers
+%%
+{application, exodm_plugin,
+ [
+  {description, "Exodm Plugin Support API"},
+  {vsn, git},
+  {registered, []},
+  {applications, [exodm]},
+  {modules,[]}
+ ]
+}.
