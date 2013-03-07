@@ -20,6 +20,7 @@
 -export([device_exists/1,
 	 lookup_device_position/1,
 	 lookup_device_keys/1,
+	 lookup_device_attr/2,
 	 add_device_session/2,
 	 remove_device_session/2]).
 
@@ -148,7 +149,7 @@ lookup_device_position(DeviceID) ->
 lookup_device_keys(DeviceID) ->
     exodm_db_device:lookup_keys(get_account(), DeviceID).
 
--spec lookup_device_attr(Attr::binary(), device_id()) -> [{Attr, any()}] | [].
+-spec lookup_device_attr(_Attr::binary(), device_id()) -> [{_Attr, any()}] | [].
 %% @doc Lookup an attribute value in a device object.
 %%
 %% If the device doesn't exist, or the requested attribute is not stored,

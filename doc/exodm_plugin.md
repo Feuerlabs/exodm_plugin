@@ -129,7 +129,7 @@ This module contains support functions for Exosense server (exodm) plugins.
 ##Function Index##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add_device_session-2">add_device_session/2</a></td><td>Register an active device session with a given protocol.</td></tr><tr><td valign="top"><a href="#add_http_session-0">add_http_session/0</a></td><td>Activate a Yaws server instance for the current application.</td></tr><tr><td valign="top"><a href="#check_queue-2">check_queue/2</a></td><td></td></tr><tr><td valign="top"><a href="#device_exists-1">device_exists/1</a></td><td>Check if the given device exists.</td></tr><tr><td valign="top"><a href="#get_account-0">get_account/0</a></td><td>Retrieves the current authorized account of the current process.</td></tr><tr><td valign="top"><a href="#get_cached_config-3">get_cached_config/3</a></td><td>Retrieves a cached config data set.</td></tr><tr><td valign="top"><a href="#login-2">login/2</a></td><td>Equivalent to <a href="#login-3"><tt>login(Account, User, true)</tt></a>.</td></tr><tr><td valign="top"><a href="#login-3">login/3</a></td><td>Authorize the current process as a given account and user.</td></tr><tr><td valign="top"><a href="#logout-0">logout/0</a></td><td>Equivalent to <a href="#logout-1"><tt>logout(true)</tt></a>.</td></tr><tr><td valign="top"><a href="#logout-1">logout/1</a></td><td>Log out the current process.</td></tr><tr><td valign="top"><a href="#lookup_device_keys-1">lookup_device_keys/1</a></td><td>Lookup the key pair associated with device.</td></tr><tr><td valign="top"><a href="#lookup_device_position-1">lookup_device_position/1</a></td><td>Lookup the last known position of the device.</td></tr><tr><td valign="top"><a href="#notification-4">notification/4</a></td><td></td></tr><tr><td valign="top"><a href="#queue_notification-4">queue_notification/4</a></td><td></td></tr><tr><td valign="top"><a href="#queue_reverse_request-4">queue_reverse_request/4</a></td><td></td></tr><tr><td valign="top"><a href="#remove_device_session-2">remove_device_session/2</a></td><td>Remove an active device session.</td></tr></table>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add_device_session-2">add_device_session/2</a></td><td>Register an active device session with a given protocol.</td></tr><tr><td valign="top"><a href="#add_http_session-0">add_http_session/0</a></td><td>Activate a Yaws server instance for the current application.</td></tr><tr><td valign="top"><a href="#check_queue-2">check_queue/2</a></td><td></td></tr><tr><td valign="top"><a href="#device_exists-1">device_exists/1</a></td><td>Check if the given device exists.</td></tr><tr><td valign="top"><a href="#get_account-0">get_account/0</a></td><td>Retrieves the current authorized account of the current process.</td></tr><tr><td valign="top"><a href="#get_cached_config-3">get_cached_config/3</a></td><td>Retrieves a cached config data set.</td></tr><tr><td valign="top"><a href="#login-2">login/2</a></td><td>Equivalent to <a href="#login-3"><tt>login(Account, User, true)</tt></a>.</td></tr><tr><td valign="top"><a href="#login-3">login/3</a></td><td>Authorize the current process as a given account and user.</td></tr><tr><td valign="top"><a href="#logout-0">logout/0</a></td><td>Equivalent to <a href="#logout-1"><tt>logout(true)</tt></a>.</td></tr><tr><td valign="top"><a href="#logout-1">logout/1</a></td><td>Log out the current process.</td></tr><tr><td valign="top"><a href="#lookup_device_attr-2">lookup_device_attr/2</a></td><td>Lookup an attribute value in a device object.</td></tr><tr><td valign="top"><a href="#lookup_device_keys-1">lookup_device_keys/1</a></td><td>Lookup the key pair associated with device.</td></tr><tr><td valign="top"><a href="#lookup_device_position-1">lookup_device_position/1</a></td><td>Lookup the last known position of the device.</td></tr><tr><td valign="top"><a href="#notification-4">notification/4</a></td><td></td></tr><tr><td valign="top"><a href="#queue_notification-4">queue_notification/4</a></td><td></td></tr><tr><td valign="top"><a href="#queue_reverse_request-4">queue_reverse_request/4</a></td><td></td></tr><tr><td valign="top"><a href="#remove_device_session-2">remove_device_session/2</a></td><td>Remove an active device session.</td></tr></table>
 
 
 <a name="functions"></a>
@@ -282,7 +282,21 @@ add events. I.e. if an account is added/deleted, the current process will
 receive messages of the form `{exodm_db_account, add, AcctName}`
 (note: not just for the wanted account). This allows processes to be
 started before the actual account has been created, and then automatically
-pick up the account creation event and log in.<a name="lookup_device_keys-1"></a>
+pick up the account creation event and log in.<a name="lookup_device_attr-2"></a>
+
+###lookup_device_attr/2##
+
+
+<pre>lookup_device_attr(_Attr::binary(), DeviceID::<a href="#type-device_id">device_id()</a>) -> [{_Attr, any()}] | []</pre>
+<br></br>
+
+
+
+
+Lookup an attribute value in a device object.
+
+If the device doesn't exist, or the requested attribute is not stored,
+the empty list (`[]`) is returned.<a name="lookup_device_keys-1"></a>
 
 ###lookup_device_keys/1##
 
