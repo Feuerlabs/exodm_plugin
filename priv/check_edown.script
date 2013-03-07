@@ -12,6 +12,11 @@ case lists:member("doc", Args) of
 			      [{'CONFIG', CONFIG}, {'DEPS', [edown]}]),
 	C1;
     true ->
+	%% We actually only need to start inets if we have a doc path with http URIS
+	application:start(crypto),
+	application:start(public_key),
+	application:start(ssl),
+	application:start(inets),
         case code:lib_dir(edown) of
             {error, bad_name} ->
                 io:fwrite("cannot find edown~n", []),
