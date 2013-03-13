@@ -11,6 +11,7 @@
 	 get_account/0]).
 
 -export([notification/4,
+	 json_rpc/2,
 	 queue_notification/4,
 	 queue_reverse_request/4,
 	 check_queue/2]).
@@ -39,6 +40,16 @@
 -type client_key() :: key().
 -type server_key() :: key().
 -type key_pair  () :: {client_key(), server_key()}.
+
+-type yang_id   () :: atom().
+-type yang_value() :: any(). % erlang representation of a yang-specified value
+-type rpc_reply () :: [{yang_id(), yang_value()}].
+
+-type json_string() :: string() | binary().
+-type json_int()    :: integer() | json_string().
+-type json_struct() :: {struct, [json()]}.
+-type json_array()  :: {array, [json()]}.
+-type json()        :: json_struct() | json_array() | json_string() | json_int().
 
 -spec add_http_session() -> ok.
 %% @doc Activate a Yaws server instance for the current application.
@@ -183,6 +194,18 @@ remove_device_session(DeviceID, Protocol) ->
     ?debug("remove_device_session(~p, ~p)~n", [DeviceID, Protocol]),
     exodm_rpc_handler:rm_device_session(get_account(), DeviceID, Protocol).
 
+-spec check_queue(to_device | from_device, device_id()) -> ok.
+%% @doc Check the notification queue belonging to device.
+%%
+%% All notifications and RPCs to/from devices are pushed device-specific queues,
+%% one for each device and direction (to or from device). Whenever a queue goes
+%% from empty to nonempty, a dispatch process is spawned to try to deliver the
+%% message. In the case of the `from_device' queue, delivery should normally
+%% succeed, so that queue dispatch normally doesn't need to be triggered.
+%%
+%% However, it is expected that a custom protocol manager triggers the
+%% `to_device' whenever a device comes online.
+%% @end
 check_queue(Direction, DeviceID0) when Direction==to_device;
 				       Direction==from_device ->
     DeviceID = exodm_db:encode_id(DeviceID0),
@@ -190,16 +213,51 @@ check_queue(Direction, DeviceID0) when Direction==to_device;
     ExtID = exodm_db:enc_ext_key(get_account(), DeviceID),
     exodm_rpc_dispatcher:check_queue(Direction, ExtID).
 
-notification(Method, Elems, Env, DeviceID) ->
-    ?debug("notification(~p, ~p, ~p, ~p)~n", [Method, Elems, Env, DeviceID]),
+-spec notification(_Method::binary(),
+		   _Elems::[{_Key::binary(), _Value::any()}],
+		   _Env:: [{atom(), any()}],
+		   device_id()) -> ok | rpc_reply() | {error, any()}.
+%% @doc Send a notification or RPC associated with `DeviceID'.
+%%
+%% This function maps `Method' to a Yang-specified Notification or RPC, using
+%% the Yang modules associated with `DeviceID'. The request is processed as
+%% if it had originated from the device. If the method is an RPC, the reply
+%% is validated against the Yang spec and converted to internal form: a list
+%% of `{Key, Value}' tuples corresponding to the 'output' elements in the spec.
+%% @end
+notification(Method, Elems, Env0, DeviceID) ->
+    ?debug("notification(~p, ~p, ~p,v ~p)~n", [Method, Elems, Env0, DeviceID]),
     AID = get_account(),
+    Env = [{aid, AID}, {'device-id', DeviceID} |
+	   [X || {K,_} = X <- Env0,
+		 not lists:keymember(K, 1, [aid, 'device-id'])]],
     case exodm_db_device:exist(AID, DeviceID) of
 	true ->
-	    exodm_rpc_handler:notification(Method, Elems, Env, AID, DeviceID);
+	    case exodm_rpc_handler:notification(
+		   Method, Elems, Env, AID, DeviceID) of
+		Reply when is_list(Reply) ->
+		    {ok, Reply};
+		Other ->
+		    Other
+	    end;
 	false ->
 	    ?debug("no such device (~p, ~p)~n", [AID, DeviceID]),
 	    error(unknown_device)
     end.
+
+-spec json_rpc(_Method::binary(), json_struct()) ->
+		      {true, json()} | {false, any()}.
+%% @doc Process an RPC as if it had come from the web.
+%%
+%% This function simulates a JSON-RPC call, e.g. `{call, Method, Elems}', as if
+%% it came from the web. `Elems' and the reply are on the same form as is
+%% returned by `json2:decode_string/1'. The request goes through the same
+%% validation and queueing as normal JSON-RPC requests. The difference is that
+%% the HTTP transport part is eliminated.
+%% @end
+json_rpc(Method, {struct, _} = Elems) ->
+    _ = json2:encode(Elems), % initial validation
+    exodm_rpc_handler:int_json_rpc({call, Method, Elems}).
 
 queue_notification(Module, Method, Elems, Env) when is_list(Elems),
 						    is_list(Env) ->

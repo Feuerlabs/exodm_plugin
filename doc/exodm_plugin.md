@@ -55,6 +55,46 @@ This module contains support functions for Exosense server (exodm) plugins.
 
 
 
+###<a name="type-json">json()</a>##
+
+
+
+<pre>json() = <a href="#type-json_struct">json_struct()</a> | <a href="#type-json_array">json_array()</a> | <a href="#type-json_string">json_string()</a> | <a href="#type-json_int">json_int()</a></pre>
+
+
+
+###<a name="type-json_array">json_array()</a>##
+
+
+
+<pre>json_array() = {array, [<a href="#type-json">json()</a>]}</pre>
+
+
+
+###<a name="type-json_int">json_int()</a>##
+
+
+
+<pre>json_int() = integer() | <a href="#type-json_string">json_string()</a></pre>
+
+
+
+###<a name="type-json_string">json_string()</a>##
+
+
+
+<pre>json_string() = string() | binary()</pre>
+
+
+
+###<a name="type-json_struct">json_struct()</a>##
+
+
+
+<pre>json_struct() = {struct, [<a href="#type-json">json()</a>]}</pre>
+
+
+
 ###<a name="type-key">key()</a>##
 
 
@@ -103,6 +143,14 @@ This module contains support functions for Exosense server (exodm) plugins.
 
 
 
+###<a name="type-rpc_reply">rpc_reply()</a>##
+
+
+
+<pre>rpc_reply() = [{<a href="#type-yang_id">yang_id()</a>, <a href="#type-yang_value">yang_value()</a>}]</pre>
+
+
+
 ###<a name="type-server_key">server_key()</a>##
 
 
@@ -124,12 +172,30 @@ This module contains support functions for Exosense server (exodm) plugins.
 
 
 <pre>user() = binary()</pre>
-<a name="index"></a>
+
+
+
+###<a name="type-yang_id">yang_id()</a>##
+
+
+
+<pre>yang_id() = atom()</pre>
+
+
+
+###<a name="type-yang_value">yang_value()</a>##
+
+
+
+<pre>yang_value() = any()</pre>
+
+
+ erlang representation of a yang-specified value<a name="index"></a>
 
 ##Function Index##
 
 
-<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add_device_session-2">add_device_session/2</a></td><td>Register an active device session with a given protocol.</td></tr><tr><td valign="top"><a href="#add_http_session-0">add_http_session/0</a></td><td>Activate a Yaws server instance for the current application.</td></tr><tr><td valign="top"><a href="#check_queue-2">check_queue/2</a></td><td></td></tr><tr><td valign="top"><a href="#device_exists-1">device_exists/1</a></td><td>Check if the given device exists.</td></tr><tr><td valign="top"><a href="#get_account-0">get_account/0</a></td><td>Retrieves the current authorized account of the current process.</td></tr><tr><td valign="top"><a href="#get_cached_config-3">get_cached_config/3</a></td><td>Retrieves a cached config data set.</td></tr><tr><td valign="top"><a href="#login-2">login/2</a></td><td>Equivalent to <a href="#login-3"><tt>login(Account, User, true)</tt></a>.</td></tr><tr><td valign="top"><a href="#login-3">login/3</a></td><td>Authorize the current process as a given account and user.</td></tr><tr><td valign="top"><a href="#logout-0">logout/0</a></td><td>Equivalent to <a href="#logout-1"><tt>logout(true)</tt></a>.</td></tr><tr><td valign="top"><a href="#logout-1">logout/1</a></td><td>Log out the current process.</td></tr><tr><td valign="top"><a href="#lookup_device_attr-2">lookup_device_attr/2</a></td><td>Lookup an attribute value in a device object.</td></tr><tr><td valign="top"><a href="#lookup_device_keys-1">lookup_device_keys/1</a></td><td>Lookup the key pair associated with device.</td></tr><tr><td valign="top"><a href="#lookup_device_position-1">lookup_device_position/1</a></td><td>Lookup the last known position of the device.</td></tr><tr><td valign="top"><a href="#notification-4">notification/4</a></td><td></td></tr><tr><td valign="top"><a href="#queue_notification-4">queue_notification/4</a></td><td></td></tr><tr><td valign="top"><a href="#queue_reverse_request-4">queue_reverse_request/4</a></td><td></td></tr><tr><td valign="top"><a href="#remove_device_session-2">remove_device_session/2</a></td><td>Remove an active device session.</td></tr></table>
+<table width="100%" border="1" cellspacing="0" cellpadding="2" summary="function index"><tr><td valign="top"><a href="#add_device_session-2">add_device_session/2</a></td><td>Register an active device session with a given protocol.</td></tr><tr><td valign="top"><a href="#add_http_session-0">add_http_session/0</a></td><td>Activate a Yaws server instance for the current application.</td></tr><tr><td valign="top"><a href="#check_queue-2">check_queue/2</a></td><td>Check the notification queue belonging to device.</td></tr><tr><td valign="top"><a href="#device_exists-1">device_exists/1</a></td><td>Check if the given device exists.</td></tr><tr><td valign="top"><a href="#get_account-0">get_account/0</a></td><td>Retrieves the current authorized account of the current process.</td></tr><tr><td valign="top"><a href="#get_cached_config-3">get_cached_config/3</a></td><td>Retrieves a cached config data set.</td></tr><tr><td valign="top"><a href="#json_rpc-2">json_rpc/2</a></td><td>Process an RPC as if it had come from the web.</td></tr><tr><td valign="top"><a href="#login-2">login/2</a></td><td>Equivalent to <a href="#login-3"><tt>login(Account, User, true)</tt></a>.</td></tr><tr><td valign="top"><a href="#login-3">login/3</a></td><td>Authorize the current process as a given account and user.</td></tr><tr><td valign="top"><a href="#logout-0">logout/0</a></td><td>Equivalent to <a href="#logout-1"><tt>logout(true)</tt></a>.</td></tr><tr><td valign="top"><a href="#logout-1">logout/1</a></td><td>Log out the current process.</td></tr><tr><td valign="top"><a href="#lookup_device_attr-2">lookup_device_attr/2</a></td><td>Lookup an attribute value in a device object.</td></tr><tr><td valign="top"><a href="#lookup_device_keys-1">lookup_device_keys/1</a></td><td>Lookup the key pair associated with device.</td></tr><tr><td valign="top"><a href="#lookup_device_position-1">lookup_device_position/1</a></td><td>Lookup the last known position of the device.</td></tr><tr><td valign="top"><a href="#notification-4">notification/4</a></td><td>Send a notification or RPC associated with <code>DeviceID</code>.</td></tr><tr><td valign="top"><a href="#queue_notification-4">queue_notification/4</a></td><td></td></tr><tr><td valign="top"><a href="#queue_reverse_request-4">queue_reverse_request/4</a></td><td></td></tr><tr><td valign="top"><a href="#remove_device_session-2">remove_device_session/2</a></td><td>Remove an active device session.</td></tr></table>
 
 
 <a name="functions"></a>
@@ -178,9 +244,24 @@ the "variables" `$PRIV_DIR`, `$LIB_DIR`, `$HOME`, etc. can be used.<a name="chec
 ###check_queue/2##
 
 
-`check_queue(Direction, DeviceID0) -> any()`
+<pre>check_queue(Direction::to_device | from_device, DeviceID0::<a href="#type-device_id">device_id()</a>) -> ok</pre>
+<br></br>
 
-<a name="device_exists-1"></a>
+
+
+
+Check the notification queue belonging to device.
+
+
+
+All notifications and RPCs to/from devices are pushed device-specific queues,
+one for each device and direction (to or from device). Whenever a queue goes
+from empty to nonempty, a dispatch process is spawned to try to deliver the
+message. In the case of the `from_device` queue, delivery should normally
+succeed, so that queue dispatch normally doesn't need to be triggered.
+
+However, it is expected that a custom protocol manager triggers the
+`to_device` whenever a device comes online.<a name="device_exists-1"></a>
 
 ###device_exists/1##
 
@@ -224,7 +305,24 @@ This function is used in response to a `push-config-set` RPC.
 When config set data is pushed, it is first stored in a cache, with a
 reference for every affected device. Afterwards, a `push-config-set` RPC
 is sent to each device. The data is in the form of a `kvdb_conf` config
-config tree (see [kvdb_conf](/Users/uwiger/FL/git/kvdb/doc/kvdb_conf.md)).<a name="login-2"></a>
+config tree (see [kvdb_conf](/Users/uwiger/FL/git/kvdb/doc/kvdb_conf.md)).<a name="json_rpc-2"></a>
+
+###json_rpc/2##
+
+
+<pre>json_rpc(_Method::binary(), Elems::<a href="#type-json_struct">json_struct()</a>) -> {true, <a href="#type-json">json()</a>} | {false, any()}</pre>
+<br></br>
+
+
+
+
+Process an RPC as if it had come from the web.
+
+This function simulates a JSON-RPC call, e.g. `{call, Method, Elems}`, as if
+it came from the web. `Elems` and the reply are on the same form as is
+returned by `json2:decode_string/1`. The request goes through the same
+validation and queueing as normal JSON-RPC requests. The difference is that
+the HTTP transport part is eliminated.<a name="login-2"></a>
 
 ###login/2##
 
@@ -328,9 +426,19 @@ If no position is stored, `{0.0, 0.0, 0}` is returned.<a name="notification-4"><
 ###notification/4##
 
 
-`notification(Method, Elems, Env, DeviceID) -> any()`
+<pre>notification(_Method::binary(), _Elems::[{_Key::binary(), _Value::any()}], _Env::[{atom(), any()}], DeviceID::<a href="#type-device_id">device_id()</a>) -> ok | <a href="#type-rpc_reply">rpc_reply()</a> | {error, any()}</pre>
+<br></br>
 
-<a name="queue_notification-4"></a>
+
+
+
+Send a notification or RPC associated with `DeviceID`.
+
+This function maps `Method` to a Yang-specified Notification or RPC, using
+the Yang modules associated with `DeviceID`. The request is processed as
+if it had originated from the device. If the method is an RPC, the reply
+is validated against the Yang spec and converted to internal form: a list
+of `{Key, Value}` tuples corresponding to the 'output' elements in the spec.<a name="queue_notification-4"></a>
 
 ###queue_notification/4##
 
