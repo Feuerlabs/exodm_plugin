@@ -16,7 +16,8 @@
 	 queue_reverse_request/4, queue_reverse_request/5,
 	 check_queue/2]).
 
--export([get_cached_config/3]).
+-export([get_cached_config/3,
+	 push_config_result/4]).
 
 -export([device_exists/1,
 	 lookup_device_position/1,
@@ -134,6 +135,21 @@ get_account() ->
 get_cached_config(ConfigSet, Ref, DeviceID) ->
     AID = exodm_db_session:get_aid(),
     exodm_db_config:get_cached(AID, ConfigSet, Ref, DeviceID).
+
+push_config_result(ok, Cfg, Ref, DeviceID) ->
+    AID = get_account(),
+    case exodm_db_config:remove_cached(AID, Cfg, Ref, DeviceID) of
+	{ok, true} ->
+	    exodm_db_config:switch_to_installed(AID, Cfg),
+	    ok;
+	{ok, false} ->
+	    ok;
+	Other ->
+	    Other
+    end;
+push_config_result(error, _, _, _) ->
+    error.
+
 
 -spec device_exists(device_id()) -> boolean().
 %% @doc Check if the given device exists.
