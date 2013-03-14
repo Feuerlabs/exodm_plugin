@@ -210,7 +210,7 @@ check_queue(Direction, DeviceID0) when Direction==to_device;
 				       Direction==from_device ->
     DeviceID = exodm_db:encode_id(DeviceID0),
     ?debug("check_queue(~p, ~p)~n", [Direction, DeviceID]),
-    ExtID = exodm_db:enc_ext_key(get_account(), DeviceID),
+    ExtID = exodm_db_device:enc_ext_key(get_account(), DeviceID),
     exodm_rpc_dispatcher:check_queue(Direction, ExtID).
 
 -spec notification(_Method::binary(),
