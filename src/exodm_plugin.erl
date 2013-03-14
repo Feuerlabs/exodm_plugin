@@ -254,7 +254,7 @@ json_rpc(Method, {struct, _} = Elems) ->
     _ = json2:encode(Elems), % initial validation
     exodm_rpc_handler:int_json_rpc({call, Method, Elems}).
 
-%% @equiv queue_notification(Module, Method, Elems, get_device_id(Env)).
+%% @equiv queue_notification(Module, Method, Elems, get_device_id(Env))
 %%
 queue_notification(Module, Method, Elems, Env) ->
     queue_notification(Module, Method, Elems, Env, get_device_id(Env)).
