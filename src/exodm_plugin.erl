@@ -12,8 +12,8 @@
 
 -export([notification/4,
 	 json_rpc/2,
-	 queue_notification/4,
-	 queue_reverse_request/4,
+	 queue_notification/4, queue_notification/5,
+	 queue_reverse_request/4, queue_reverse_request/5,
 	 check_queue/2]).
 
 -export([get_cached_config/3]).
@@ -227,23 +227,18 @@ check_queue(Direction, DeviceID0) when Direction==to_device;
 %% @end
 notification(Method, Elems, Env0, DeviceID) ->
     ?debug("notification(~p, ~p, ~p,v ~p)~n", [Method, Elems, Env0, DeviceID]),
-    AID = get_account(),
-    Env = [{aid, AID}, {'device-id', DeviceID} |
-	   [X || {K,_} = X <- Env0,
-		 not lists:keymember(K, 1, [aid, 'device-id'])]],
-    case exodm_db_device:exist(AID, DeviceID) of
-	true ->
-	    case exodm_rpc_handler:notification(
-		   Method, Elems, Env, AID, DeviceID) of
-		Reply when is_list(Reply) ->
-		    {ok, Reply};
-		Other ->
-		    Other
-	    end;
-	false ->
-	    ?debug("no such device (~p, ~p)~n", [AID, DeviceID]),
-	    error(unknown_device)
-    end.
+    if_device_exists(
+      DeviceID, Env0,
+      fun(Env) ->
+	      AID = get_account(),
+	      case exodm_rpc_handler:notification(
+		     Method, Elems, Env, AID, DeviceID) of
+		  Reply when is_list(Reply) ->
+		      {ok, Reply};
+		  Other ->
+		      Other
+	      end
+      end).
 
 -spec json_rpc(_Method::binary(), json_struct()) ->
 		      {true, json()} | {false, any()}.
@@ -259,13 +254,70 @@ json_rpc(Method, {struct, _} = Elems) ->
     _ = json2:encode(Elems), % initial validation
     exodm_rpc_handler:int_json_rpc({call, Method, Elems}).
 
-queue_notification(Module, Method, Elems, Env) when is_list(Elems),
-						    is_list(Env) ->
-    ?debug("(~p, ~p, ~p, ~p)~n", [Module, Method, Elems, Env]),
-    exodm_rpc:queue_notification(Module, notify, Env, Method, Elems).
+%% @equiv queue_notification(Module, Method, Elems, get_device_id(Env)).
+%%
+queue_notification(Module, Method, Elems, Env) ->
+    queue_notification(Module, Method, Elems, Env, get_device_id(Env)).
+
+
+-spec queue_notification(_Module::binary(), _Method::binary(),
+			 _Elems::[{binary() | atom(), any()}],
+			 _Env::[{atom(), any()}], device_id()) ->
+				{ok, _Queue::binary(), _AbsKey::any()}
+				    | {error, any()}.
+%% @doc Queue a message for notification "upstream" for DeviceID.
+%%
+%% The message will be queued in the `from_device' queue, and dispatched
+%% as soon as possible.
+queue_notification(Module, Method, Elems, Env0, DeviceID) when is_list(Elems),
+							       is_list(Env0) ->
+    ?debug("(~p, ~p, ~p, ~p, ~p)~n", [Module, Method, Elems, Env0, DeviceID]),
+    if_device_exists(
+      DeviceID, Env0,
+      fun(Env) ->
+	      exodm_rpc:queue_notification(Module, notify, Env, Method, Elems)
+      end).
 
 queue_reverse_request(Module, Method, Elems, Env) ->
-    exodm_rpc:queue_notification(Module, reverse_request, Env, Method, Elems).
+    queue_reverse_request(Module, Method, Elems, Env, get_device_id(Env)).
+
+-spec queue_reverse_request(_Module::binary(), _Method::binary(),
+			    _Elems::[{binary() | atom(), any()}],
+			    _Env::[{atom(), any()}], device_id()) ->
+				   {ok, _Queue::binary(), _AbsKey::any()}
+				       | {error, any()}.
+%% @doc Queue an RPC for delivery "upstream" for DeviceID.
+%%
+%% The message will be queued in the `from_device' queue, and dispatched
+%% as soon as possible.
+queue_reverse_request(Module, Method, Elems, Env0, DeviceID) ->
+    ?debug("(~p, ~p, ~p, ~p, ~p)~n", [Module, Method, Elems, Env0, DeviceID]),
+    if_device_exists(
+      DeviceID, Env0,
+      fun(Env) ->
+	      exodm_rpc:queue_notification(
+		Module, reverse_request, Env, Method, Elems)
+      end).
+
+get_device_id(Env) ->
+    case lists:keyfind('device-id', 1, Env) of
+	{_, DeviceID} ->
+	    DeviceID;
+	false ->
+	    error(unknown_device)
+    end.
+
+
+if_device_exists(DeviceID, Env, F) ->
+    AID = get_account(),
+    case exodm_db_device:exist(AID, DeviceID) of
+	true ->
+	    F(fix_env(DeviceID, Env));
+	false ->
+	    ?debug("no such device (~p, ~p)~n", [AID, DeviceID]),
+	    error(unknown_device)
+    end.
+
 
 login_(Account, User, Subscribe, Retries) when is_integer(Retries) ->
     case get_account_id(Account) of
@@ -290,6 +342,12 @@ login_(Account, User, Subscribe, Retries) when is_integer(Retries) ->
 	false ->
 	    false
     end.
+
+fix_env(DeviceID, Env0) ->
+    AID = get_account(),
+    [{aid, AID}, {'device-id', DeviceID} |
+     [X || {K,_} = X <- Env0,
+	   not lists:keymember(K, 1, [aid, 'device-id'])]].
 
 get_account_id(Acct) ->
     case exodm_db_account:exist(Acct) of
