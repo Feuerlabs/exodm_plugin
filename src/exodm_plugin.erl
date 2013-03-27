@@ -6,6 +6,7 @@
 -module(exodm_plugin).
 
 -export([add_http_session/0,
+	 load_yang_module/3,
 	 login/2, login/3,
 	 logout/0, logout/1,
 	 get_account/0]).
@@ -65,6 +66,18 @@
 %% @end
 add_http_session() ->
     exodm_http:add_session().
+
+load_yang_module(Area, ModuleName, Bin) when is_binary(ModuleName),
+					     is_binary(Bin),
+					     Area==user;
+					     Area==system ->
+    if Area==system ->
+	    exodm_db_yang:write_system(ModuleName, Bin);
+       Area==user ->
+	    Acct = get_account(),
+	    io:fwrite("Acct = ~p~n", [Acct]),
+	    exodm_db_yang:write(get_account(), ModuleName, Bin)
+    end.
 
 -spec login(account(), user()) -> boolean().
 %% @equiv login(Account, User, true)
