@@ -1,9 +1,9 @@
 
 
-#The exodm_plugin application#
+# The exodm_plugin application #
 
 
-##Modules##
+## Modules ##
 
 
 <table width="100%" border="0" summary="list of modules">
