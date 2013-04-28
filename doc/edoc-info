@@ -1,3 +1,3 @@
 {application,exodm_plugin}.
 {packages,[]}.
-{modules,[exodm_plugin]}.
+{modules,[exodm_plugin,exodm_plugin_lib]}.

@@ -1,9 +1,29 @@
+%% @doc Helper functions for plugin development
+%% @author Ulf Wiger <ulf@feuerlabs.com>
+%% @end
 -module(exodm_plugin_lib).
 
 -export([data_to_json/3]).
 
 -include_lib("lager/include/log.hrl").
+-include_lib("yang/include/yang_types.hrl").
 
+-type elem_key() :: atom() | [byte()] | binary().
+-type elem() :: [{elem_key(), any()}].
+
+-spec data_to_json([yang_statement()], [{atom(),any()}], [elem()]) ->
+		   [{binary(), binary()}].
+%% @spec data_to_json(YangOutputSpec, Env, MsgElems) -> JSONParams
+%% @doc Exosense wrapper around `yang_json:data_to_json(Spec,Env,Elems)'.
+%%
+%% This function emulates the semantics added by Exosense Server on top of
+%% `yang_json:data_to_json/3', and is meant to be used in unit testing.
+%%
+%% Specifically, it checks for the presence of the "rpc-status" and
+%% "rpc-status-string" elements, and assigns a corresponding value to
+%% "rpc-status-string", in line with the behavior described in the
+%% `exosense.yang' specification.
+%% @end
 data_to_json(Spec, Env, Data) ->
     ?debug("data_to_json(~p, ~p, ~p)~n", [Spec, Env, Data]),
     case find_leaf(<<"rpc-status-string">>, Spec) of
