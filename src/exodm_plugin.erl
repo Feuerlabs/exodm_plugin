@@ -15,7 +15,8 @@
 	 json_rpc/2,
 	 queue_notification/4, queue_notification/5,
 	 queue_reverse_request/4, queue_reverse_request/5,
-	 check_queue/2]).
+	 check_queue/2,
+	 asynch_check_queue/2]).
 
 -export([get_cached_config/3,
 	 push_config_result/4]).
@@ -241,6 +242,27 @@ check_queue(Direction, DeviceID0) when Direction==to_device;
     ?debug("check_queue(~p, ~p)~n", [Direction, DeviceID]),
     ExtID = exodm_db_device:enc_ext_key(get_account(), DeviceID),
     exodm_rpc_dispatcher:check_queue(Direction, ExtID).
+
+-spec asynch_check_queue(to_device | from_device, device_id()) -> ok | error.
+%% @doc Check the notification queue belonging to device.
+%%
+%% All notifications and RPCs to/from devices are pushed device-specific queues,
+%% one for each device and direction (to or from device). Whenever a queue goes
+%% from empty to nonempty, a dispatch process is spawned to try to deliver the
+%% message. In the case of the `from_device' queue, delivery should normally
+%% succeed, so that queue dispatch normally doesn't need to be triggered.
+%%
+%% However, it is expected that a custom protocol manager triggers the
+%% `to_device' whenever a device comes online.
+%%
+%% Unlike check_queue/2, this function does not wait for a reply.
+%% @end
+asynch_check_queue(Direction, DeviceID0) when Direction==to_device;
+				       Direction==from_device ->
+    DeviceID = exodm_db:encode_id(DeviceID0),
+    ?debug("check_queue(~p, ~p)~n", [Direction, DeviceID]),
+    ExtID = exodm_db_device:enc_ext_key(get_account(), DeviceID),
+    exodm_rpc_dispatcher:asynch_check_queue(Direction, ExtID).
 
 -spec notification(_Method::binary(),
 		   _Elems::[{_Key::binary(), _Value::any()}],
