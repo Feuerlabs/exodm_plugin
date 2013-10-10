@@ -28,6 +28,10 @@
 	 add_device_session/2,
 	 remove_device_session/2]).
 
+-export([spawn/1,
+	 spawn_link/1,
+	 spawn_monitor/1]).
+
 -include_lib("lager/include/log.hrl").
 
 -type account   () :: binary().
@@ -412,3 +416,30 @@ get_account_id(Acct) ->
 	true ->
 	    Acct
     end.
+
+-spec spawn( fun( () -> any() ) ) -> pid().
+%% @doc Like the `spawn/1' BIF, but with authorization inheritance.
+%%
+%% In other words, the spawned process will have the same access rights as
+%% its parent.
+%% @end
+spawn(F) when is_function(F, 0) ->
+    exodm_db_session:spawn_child(F).
+
+-spec spawn_link( fun( () -> any() ) ) -> pid().
+%% @doc Like the `spawn_link/1' BIF, but with authorization inheritance.
+%%
+%% In other words, the spawned process will have the same access rights as
+%% its parent.
+%% @end
+spawn_link(F) when is_function(F, 0) ->
+    exodm_db_session:spawn_link_child(F).
+
+-spec spawn_monitor( fun( () -> any() ) ) -> {pid(), reference()}.
+%% @doc Like the `spawn_monitor/1' BIF, but with authorization inheritance.
+%%
+%% In other words, the spawned process will have the same access rights as
+%% its parent.
+%% @end
+spawn_monitor(F) when is_function(F, 0) ->
+    exodm_db_session:spawn_monitor_child(F).
