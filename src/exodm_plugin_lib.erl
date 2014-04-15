@@ -5,7 +5,6 @@
 
 -export([data_to_json/3]).
 
--include_lib("lager/include/log.hrl").
 -include_lib("yang/include/yang_types.hrl").
 
 -type elem_key() :: atom() | [byte()] | binary().
@@ -25,7 +24,7 @@
 %% `exosense.yang' specification.
 %% @end
 data_to_json(Spec, Env, Data) ->
-    ?debug("data_to_json(~p, ~p, ~p)~n", [Spec, Env, Data]),
+    lager:debug("data_to_json(~p, ~p, ~p)~n", [Spec, Env, Data]),
     case find_leaf(<<"rpc-status-string">>, Spec) of
         false ->
             yang_json:data_to_json(Spec, Env, Data);
