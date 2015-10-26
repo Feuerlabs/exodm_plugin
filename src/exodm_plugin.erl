@@ -32,8 +32,6 @@
 	 spawn_link/1,
 	 spawn_monitor/1]).
 
--include_lib("lager/include/log.hrl").
-
 -type account   () :: binary().
 -type user      () :: binary().
 -type device_id () :: binary().
@@ -214,7 +212,7 @@ lookup_device_attr(Attr, DeviceID) ->
 %% of the account name and device ID.
 %% @end
 add_device_session(Protocol, DeviceID) ->
-    ?debug("add_device_session(~p, ~p)~n", [DeviceID, Protocol]),
+    lager:debug("add_device_session(~p, ~p)~n", [DeviceID, Protocol]),
     exodm_rpc_handler:add_device_session(get_account(), DeviceID, Protocol).
 
 -spec remove_device_session(device_id(), protocol()) -> true.
@@ -225,7 +223,7 @@ add_device_session(Protocol, DeviceID) ->
 %% such session.
 %% @end
 remove_device_session(DeviceID, Protocol) ->
-    ?debug("remove_device_session(~p, ~p)~n", [DeviceID, Protocol]),
+    lager:debug("remove_device_session(~p, ~p)~n", [DeviceID, Protocol]),
     exodm_rpc_handler:rm_device_session(get_account(), DeviceID, Protocol).
 
 -spec check_queue(to_device | from_device, device_id()) -> ok.
@@ -243,7 +241,7 @@ remove_device_session(DeviceID, Protocol) ->
 check_queue(Direction, DeviceID0) when Direction==to_device;
 				       Direction==from_device ->
     DeviceID = exodm_db:encode_id(DeviceID0),
-    ?debug("check_queue(~p, ~p)~n", [Direction, DeviceID]),
+    lager:debug("check_queue(~p, ~p)~n", [Direction, DeviceID]),
     ExtID = exodm_db_device:enc_ext_key(get_account(), DeviceID),
     exodm_rpc_dispatcher:check_queue(Direction, ExtID).
 
@@ -264,7 +262,7 @@ check_queue(Direction, DeviceID0) when Direction==to_device;
 asynch_check_queue(Direction, DeviceID0) when Direction==to_device;
 				       Direction==from_device ->
     DeviceID = exodm_db:encode_id(DeviceID0),
-    ?debug("check_queue(~p, ~p)~n", [Direction, DeviceID]),
+    lager:debug("check_queue(~p, ~p)~n", [Direction, DeviceID]),
     ExtID = exodm_db_device:enc_ext_key(get_account(), DeviceID),
     exodm_rpc_dispatcher:asynch_check_queue(Direction, ExtID).
 
@@ -281,7 +279,7 @@ asynch_check_queue(Direction, DeviceID0) when Direction==to_device;
 %% of `{Key, Value}' tuples corresponding to the 'output' elements in the spec.
 %% @end
 notification(Method, Elems, Env0, DeviceID) ->
-    ?debug("notification(~p, ~p, ~p,v ~p)~n", [Method, Elems, Env0, DeviceID]),
+    lager:debug("notification(~p, ~p, ~p,v ~p)~n", [Method, Elems, Env0, DeviceID]),
     if_device_exists(
       DeviceID, Env0,
       fun(Env) ->
@@ -326,7 +324,7 @@ queue_notification(Module, Method, Elems, Env) ->
 %% as soon as possible.
 queue_notification(Module, Method, Elems, Env0, DeviceID) when is_list(Elems),
 							       is_list(Env0) ->
-    ?debug("(~p, ~p, ~p, ~p, ~p)~n", [Module, Method, Elems, Env0, DeviceID]),
+    lager:debug("(~p, ~p, ~p, ~p, ~p)~n", [Module, Method, Elems, Env0, DeviceID]),
     if_device_exists(
       DeviceID, Env0,
       fun(Env) ->
@@ -346,7 +344,7 @@ queue_reverse_request(Module, Method, Elems, Env) ->
 %% The message will be queued in the `from_device' queue, and dispatched
 %% as soon as possible.
 queue_reverse_request(Module, Method, Elems, Env0, DeviceID) ->
-    ?debug("(~p, ~p, ~p, ~p, ~p)~n", [Module, Method, Elems, Env0, DeviceID]),
+    lager:debug("(~p, ~p, ~p, ~p, ~p)~n", [Module, Method, Elems, Env0, DeviceID]),
     if_device_exists(
       DeviceID, Env0,
       fun(Env) ->
@@ -369,7 +367,7 @@ if_device_exists(DeviceID, Env, F) ->
 	true ->
 	    F(fix_env(DeviceID, Env));
 	false ->
-	    ?debug("no such device (~p, ~p)~n", [AID, DeviceID]),
+	    lager:debug("no such device (~p, ~p)~n", [AID, DeviceID]),
 	    error(unknown_device)
     end.
 
